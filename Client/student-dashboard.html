@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SAB Library | Student Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body class="dashboard-body">
+
+
+    <!-- ================================
+         TOP NAVBAR
+    ================================= -->
+
+    <header class="dashboard-navbar">
+
+        <a
+            href="index.html"
+            class="dashboard-brand"
+        >
+
+            <div class="dashboard-logo">
+                SAB
+            </div>
+
+            <div>
+
+                <h2>
+                    SAB Library
+                </h2>
+
+                <p>
+                    Student Portal
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <button
+            class="dashboard-logout"
+            onclick="studentLogout()"
+        >
+            Logout
+        </button>
+
+    </header>
+
+
+
+    <!-- ================================
+         MAIN DASHBOARD
+    ================================= -->
+
+    <main class="student-dashboard-main">
+
+
+        <section class="student-welcome-section">
+
+            <div>
+
+                <p class="dashboard-eyebrow">
+                    STUDENT MEMBER PORTAL
+                </p>
+
+                <h1>
+                    Your Study Space,
+                    <span>Your Progress.</span>
+                </h1>
+
+                <p>
+                    View your SAB Library membership,
+                    seat allocation and validity details here.
+                </p>
+
+            </div>
+
+
+            <div class="dashboard-mini-quote">
+
+                <span>
+                    “
+                </span>
+
+                Stay consistent.
+                Your goals are getting closer.
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================
+             STUDENT DATA FROM JS
+        ================================= -->
+
+        <section class="student-dashboard-card">
+
+            <div class="dashboard-card-heading">
+
+                <div>
+
+                    <p class="dashboard-section-label">
+                        MEMBERSHIP OVERVIEW
+                    </p>
+
+                    <h2>
+                        My Library Account
+                    </h2>
+
+                </div>
+
+
+                <div class="verified-member-badge">
+
+                    <span>✓</span>
+
+                    SAB Member
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="studentDetails"
+                class="student-details-content"
+            >
+                <div class="dashboard-loading">
+                    Loading your membership details...
+                </div>
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================
+             MEMBER INFO
+        ================================= -->
+
+        <section class="student-info-grid">
+
+
+            <article class="student-info-card">
+
+                <div class="student-info-icon">
+                    📚
+                </div>
+
+                <div>
+
+                    <h3>
+                        Focus on Your Goal
+                    </h3>
+
+                    <p>
+                        Make every library session count.
+                        Consistency creates long-term results.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <article class="student-info-card">
+
+                <div class="student-info-icon">
+                    ◷
+                </div>
+
+                <div>
+
+                    <h3>
+                        Check Your Validity
+                    </h3>
+
+                    <p>
+                        Keep an eye on your membership
+                        validity so you can renew on time.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <article class="student-info-card">
+
+                <div class="student-info-icon">
+                    ◈
+                </div>
+
+                <div>
+
+                    <h3>
+                        Need Assistance?
+                    </h3>
+
+                    <p>
+                        Contact the library administrator
+                        for membership or seat related support.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+        </section>
+
+
+
+        <!-- ================================
+             MOTIVATION
+        ================================= -->
+
+        <section class="student-motivation-banner">
+
+            <p>
+                TODAY'S REMINDER
+            </p>
+
+            <h2>
+                One focused hour today can change
+                where you stand tomorrow.
+            </h2>
+
+        </section>
+
+
+    </main>
+
+
+
+    <footer class="dashboard-footer">
+
+        <p>
+            © 2026 SAB Library • Study • Focus • Achieve
+        </p>
+
+    </footer>
+
+
+
+    <script src="student-dashboard.js"></script>
+
+</body>
+
+</html>

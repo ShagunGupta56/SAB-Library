@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SAB Library | Admin Login</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body class="auth-body">
+
+    <div class="auth-page">
+
+
+        <!-- LEFT BRAND PANEL -->
+
+        <section class="auth-brand-panel">
+
+            <a
+                href="index.html"
+                class="auth-brand"
+            >
+
+                <div class="auth-logo">
+                    SAB
+                </div>
+
+                <div>
+                    <h2>
+                        SAB Library
+                    </h2>
+
+                    <p>
+                        Study • Focus • Achieve
+                    </p>
+                </div>
+
+            </a>
+
+
+
+            <div class="auth-brand-content">
+
+                <p class="auth-eyebrow">
+                    ADMINISTRATION PORTAL
+                </p>
+
+                <h1>
+                    Manage With
+                    <span>Clarity & Control.</span>
+                </h1>
+
+                <p class="auth-description">
+
+                    Secure access for authorised SAB Library
+                    administrators to manage registrations,
+                    seats, memberships and student records.
+
+                </p>
+
+
+                <div class="auth-benefits">
+
+                    <div>
+                        <span>✓</span>
+                        Manage student registrations
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Allocate and release seats
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Activate memberships
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Monitor library availability
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="auth-quote">
+
+                <span>
+                    “
+                </span>
+
+                Good management creates
+                a better environment for every learner.
+
+            </div>
+
+        </section>
+
+
+
+        <!-- RIGHT ADMIN LOGIN PANEL -->
+
+        <section class="auth-form-panel">
+
+            <div class="login-card admin-login-card">
+
+
+                <div class="auth-form-header">
+
+                    <a
+                        href="index.html"
+                        class="back-home"
+                    >
+                        ← Back to Home
+                    </a>
+
+
+                    <p class="form-label">
+                        SECURE ADMIN ACCESS
+                    </p>
+
+
+                    <h2>
+                        Admin Login
+                    </h2>
+
+
+                    <p>
+                        Sign in with your authorised
+                        administrator credentials.
+                    </p>
+
+                </div>
+
+
+
+                <div class="admin-security-badge">
+
+                    <div class="security-icon">
+                        ◆
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Protected Administration
+                        </strong>
+
+                        <p>
+                            Restricted to authorised SAB Library staff.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="admin-login-form">
+
+
+                    <div class="form-group">
+
+                        <label for="username">
+                            Username
+                        </label>
+
+                        <input
+                            type="text"
+                            id="username"
+                            placeholder="Enter admin username"
+                            autocomplete="username"
+                            maxlength="50"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="password">
+                            Password
+                        </label>
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                id="password"
+                                placeholder="Enter admin password"
+                                autocomplete="current-password"
+                            >
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                onclick="toggleAdminPassword()"
+                                aria-label="Show or hide password"
+                            >
+                                Show
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <button
+                        type="button"
+                        class="auth-submit-btn admin-login-btn"
+                        onclick="adminLogin()"
+                    >
+
+                        Login to Dashboard
+
+                        <span>
+                            →
+                        </span>
+
+                    </button>
+
+
+                </div>
+
+
+
+                <div
+                    id="loginMessage"
+                    class="form-message"
+                ></div>
+
+
+
+                <div class="admin-login-note">
+
+                    <span>
+                        🔒
+                    </span>
+
+                    Never share administrator credentials
+                    with students or unauthorised persons.
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+
+
+    <script src="admin-login.js"></script>
+
+
+    <script>
+
+        function toggleAdminPassword() {
+
+            const passwordInput =
+                document.getElementById("password");
+
+            const toggleButton =
+                document.querySelector(".password-toggle");
+
+
+            if (passwordInput.type === "password") {
+
+                passwordInput.type = "text";
+
+                toggleButton.textContent = "Hide";
+
+            } else {
+
+                passwordInput.type = "password";
+
+                toggleButton.textContent = "Show";
+
+            }
+
+        }
+
+
+        document
+            .getElementById("password")
+            .addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (event.key === "Enter") {
+
+                        adminLogin();
+
+                    }
+
+                }
+            );
+
+    </script>
+
+</body>
+
+</html>

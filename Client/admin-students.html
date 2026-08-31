@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        SAB Library | Student Management
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body class="students-admin-body">
+
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="admin-sidebar">
+
+
+        <a
+            href="index.html"
+            class="admin-sidebar-brand"
+        >
+
+            <div class="admin-sidebar-logo">
+                SAB
+            </div>
+
+
+            <div>
+
+                <h2>
+                    SAB Library
+                </h2>
+
+                <p>
+                    Administration
+                </p>
+
+            </div>
+
+        </a>
+
+
+
+        <nav class="admin-sidebar-nav">
+
+            <a href="admin-dashboard.html">
+
+                <span>
+                    ▦
+                </span>
+
+                Dashboard
+
+            </a>
+
+
+            <a
+                href="admin-students.html"
+                class="active"
+            >
+
+                <span>
+                    ♙
+                </span>
+
+                Manage Students
+
+            </a>
+
+
+            <a href="index.html">
+
+                <span>
+                    ⌂
+                </span>
+
+                View Website
+
+            </a>
+
+        </nav>
+
+
+
+        <div class="admin-sidebar-bottom">
+
+
+            <div class="admin-secure-info">
+
+                <span>
+                    ◆
+                </span>
+
+                <div>
+
+                    <strong>
+                        Secure Portal
+                    </strong>
+
+                    <p>
+                        Authorised access only
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="admin-sidebar-logout"
+                onclick="logoutFromStudents()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="student-management-main">
+
+
+        <!-- TOPBAR -->
+
+        <header class="student-management-topbar">
+
+
+            <div>
+
+                <p class="admin-eyebrow">
+                    SAB LIBRARY MANAGEMENT
+                </p>
+
+                <h1>
+                    Student Management
+                </h1>
+
+            </div>
+
+
+            <a
+                href="admin-dashboard.html"
+                class="back-dashboard-btn"
+            >
+                ← Dashboard
+            </a>
+
+        </header>
+
+
+
+        <!-- PAGE INTRO -->
+
+        <section class="management-heading-section">
+
+
+            <div>
+
+                <p class="management-label">
+                    MEMBER RECORDS
+                </p>
+
+
+                <h2>
+                    Manage Library Students
+                </h2>
+
+
+                <p>
+                    Review registrations, approve students,
+                    allocate seats and manage membership
+                    status from one place.
+                </p>
+
+            </div>
+
+
+            <div class="management-security-badge">
+
+                <span>
+                    ●
+                </span>
+
+                Admin Access
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================================
+             INFO STRIP
+        ========================================== -->
+
+        <section class="management-info-strip">
+
+
+            <div class="management-info-item">
+
+                <span>
+                    01
+                </span>
+
+                <div>
+
+                    <strong>
+                        Approve
+                    </strong>
+
+                    <p>
+                        Verify registration
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="management-info-divider"></div>
+
+
+
+            <div class="management-info-item">
+
+                <span>
+                    02
+                </span>
+
+                <div>
+
+                    <strong>
+                        Allocate
+                    </strong>
+
+                    <p>
+                        Assign available seat
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="management-info-divider"></div>
+
+
+
+            <div class="management-info-item">
+
+                <span>
+                    03
+                </span>
+
+                <div>
+
+                    <strong>
+                        Activate
+                    </strong>
+
+                    <p>
+                        Start membership
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="management-info-divider"></div>
+
+
+
+            <div class="management-info-item">
+
+                <span>
+                    04
+                </span>
+
+                <div>
+
+                    <strong>
+                        Maintain
+                    </strong>
+
+                    <p>
+                        Renew or deactivate
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             TABLE PANEL
+        ========================================== -->
+
+        <section class="students-table-panel">
+
+
+            <div class="students-table-heading">
+
+
+                <div>
+
+                    <p>
+                        STUDENT DIRECTORY
+                    </p>
+
+                    <h2>
+                        Registered Students
+                    </h2>
+
+                </div>
+
+
+                <div class="table-live-status">
+
+                    <span></span>
+
+                    Live Records
+
+                </div>
+
+            </div>
+
+            <div class="student-tools-bar">
+
+    <div class="student-search-box">
+
+        <input
+            type="text"
+            id="studentSearch"
+            placeholder="Search by name, phone or Library ID..."
+        >
+
+    </div>
+
+
+    <select id="studentFilter">
+
+        <option value="ALL">
+            All Students
+        </option>
+
+        <option value="PENDING">
+            Pending Approval
+        </option>
+
+        <option value="ACTIVE">
+            Active Students
+        </option>
+
+        <option value="EXPIRED">
+            Expired Membership
+        </option>
+
+        <option value="OVERDUE">
+            Renewal Overdue
+        </option>
+
+        <option value="INACTIVE">
+            Inactive Students
+        </option>
+
+    </select>
+
+</div>
+
+            <div class="students-table-note">
+
+              
+
+    <span>
+        i
+    </span>
+
+    <p>
+        Admin workflow:
+        Approve registration → Allocate seat →
+        Activate membership → Renew when required.
+        If a membership expires, allow a short renewal period
+        before using “Deactivate & Release Seat”.
+    </p>
+
+
+
+            </div>
+
+
+
+            <div class="premium-table-container">
+
+
+                <table class="premium-students-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Class
+                            </th>
+
+                            <th>
+                                Phone
+                            </th>
+
+                            <th>
+                                Library ID
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Membership
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody id="studentsTable">
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- FOOT NOTE -->
+
+        <section class="student-management-footer-note">
+
+            <span>
+                ◆
+            </span>
+
+            <p>
+
+                Student credentials and membership information
+                should only be handled by authorised SAB Library
+                administrators.
+
+            </p>
+
+        </section>
+
+
+    </main>
+
+
+
+    <script src="admin-students.js"></script>
+
+
+    <script>
+
+        function logoutFromStudents() {
+
+            localStorage.removeItem("adminToken");
+
+            window.location.href =
+                "admin-login.html";
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

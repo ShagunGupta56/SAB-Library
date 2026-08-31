@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SAB Library | Admin Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body class="admin-dashboard-body">
+
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="admin-sidebar">
+
+        <a
+            href="index.html"
+            class="admin-sidebar-brand"
+        >
+
+            <div class="admin-sidebar-logo">
+                SAB
+            </div>
+
+            <div>
+
+                <h2>
+                    SAB Library
+                </h2>
+
+                <p>
+                    Administration
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <nav class="admin-sidebar-nav">
+
+            <a
+                href="admin-dashboard.html"
+                class="active"
+            >
+                <span>▦</span>
+                Dashboard
+            </a>
+
+
+            <button onclick="manageStudents()">
+                <span>♙</span>
+                Manage Students
+            </button>
+
+
+            <a href="index.html">
+                <span>⌂</span>
+                View Website
+            </a>
+
+        </nav>
+
+
+        <div class="admin-sidebar-bottom">
+
+            <div class="admin-secure-info">
+
+                <span>◆</span>
+
+                <div>
+
+                    <strong>
+                        Secure Portal
+                    </strong>
+
+                    <p>
+                        Authorised access only
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="admin-sidebar-logout"
+                onclick="adminLogout()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="admin-dashboard-main">
+
+
+        <!-- TOPBAR -->
+
+        <header class="admin-dashboard-topbar">
+
+            <div>
+
+                <p class="admin-eyebrow">
+                    SAB LIBRARY MANAGEMENT
+                </p>
+
+                <h1>
+                    Admin Dashboard
+                </h1>
+
+            </div>
+
+
+            <div class="admin-topbar-right">
+
+                <div class="admin-live-badge">
+
+                    <span></span>
+
+                    System Active
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- INTRO -->
+
+        <section class="admin-dashboard-intro">
+
+            <div>
+
+                <h2>
+                    Library Overview
+                </h2>
+
+                <p>
+                    Monitor students, seats and memberships
+                    from one place.
+                </p>
+
+            </div>
+
+
+            <button
+                class="admin-primary-action"
+                onclick="manageStudents()"
+            >
+                Manage Students
+                <span>→</span>
+            </button>
+
+        </section>
+
+
+
+        <!-- =========================================
+             STAT CARDS
+        ========================================== -->
+
+        <section class="admin-stat-grid">
+
+
+            <article class="admin-stat-card">
+
+                <div class="admin-stat-top">
+
+                    <div class="admin-stat-icon">
+                        ♙
+                    </div>
+
+                    <span class="admin-stat-label">
+                        STUDENTS
+                    </span>
+
+                </div>
+
+
+                <p class="admin-stat-title">
+                    Total Students
+                </p>
+
+                <strong id="totalStudents">
+                    0
+                </strong>
+
+                <span class="admin-stat-caption">
+                    Total registered records
+                </span>
+
+            </article>
+
+
+
+            <article class="admin-stat-card pending-card">
+
+                <div class="admin-stat-top">
+
+                    <div class="admin-stat-icon">
+                        ◷
+                    </div>
+
+                    <span class="admin-stat-label">
+                        REGISTRATIONS
+                    </span>
+
+                </div>
+
+
+                <p class="admin-stat-title">
+                    Pending Students
+                </p>
+
+                <strong id="pendingStudents">
+                    0
+                </strong>
+
+                <span class="admin-stat-caption">
+                    Awaiting admin approval
+                </span>
+
+            </article>
+
+
+
+            <article class="admin-stat-card active-card">
+
+                <div class="admin-stat-top">
+
+                    <div class="admin-stat-icon">
+                        ✓
+                    </div>
+
+                    <span class="admin-stat-label">
+                        MEMBERS
+                    </span>
+
+                </div>
+
+
+                <p class="admin-stat-title">
+                    Active Students
+                </p>
+
+                <strong id="activeStudents">
+                    0
+                </strong>
+
+                <span class="admin-stat-caption">
+                    Currently active students
+                </span>
+
+            </article>
+
+
+
+            <article class="admin-stat-card">
+
+                <div class="admin-stat-top">
+
+                    <div class="admin-stat-icon">
+                        ◈
+                    </div>
+
+                    <span class="admin-stat-label">
+                        SEATING
+                    </span>
+
+                </div>
+
+
+                <p class="admin-stat-title">
+                    Available Seats
+                </p>
+
+                <strong id="availableSeats">
+                    0
+                </strong>
+
+                <span class="admin-stat-caption">
+                    Ready for allocation
+                </span>
+
+            </article>
+
+
+
+            <article class="admin-stat-card occupied-card">
+
+                <div class="admin-stat-top">
+
+                    <div class="admin-stat-icon">
+                        ■
+                    </div>
+
+                    <span class="admin-stat-label">
+                        SEATING
+                    </span>
+
+                </div>
+
+
+                <p class="admin-stat-title">
+                    Occupied Seats
+                </p>
+
+                <strong id="occupiedSeats">
+                    0
+                </strong>
+
+                <span class="admin-stat-caption">
+                    Currently allotted seats
+                </span>
+
+            </article>
+
+
+
+            <article class="admin-stat-card active-card">
+
+                <div class="admin-stat-top">
+
+                    <div class="admin-stat-icon">
+                        ◆
+                    </div>
+
+                    <span class="admin-stat-label">
+                        MEMBERSHIP
+                    </span>
+
+                </div>
+
+
+                <p class="admin-stat-title">
+                    Active Memberships
+                </p>
+
+                <strong id="activeMemberships">
+                    0
+                </strong>
+
+                <span class="admin-stat-caption">
+                    Valid memberships
+                </span>
+
+            </article>
+
+
+
+            <article class="admin-stat-card expired-card">
+
+                <div class="admin-stat-top">
+
+                    <div class="admin-stat-icon">
+                        !
+                    </div>
+
+                    <span class="admin-stat-label">
+                        MEMBERSHIP
+                    </span>
+
+                </div>
+
+
+                <p class="admin-stat-title">
+                    Expired Memberships
+                </p>
+
+                <strong id="expiredMemberships">
+                    0
+                </strong>
+
+                <span class="admin-stat-caption">
+                    Memberships requiring renewal
+                </span>
+
+            </article>
+
+
+        </section>
+
+
+        <!-- =========================================
+     NEEDS ATTENTION
+========================================= -->
+
+<section class="admin-attention-section">
+
+    <div class="attention-header">
+
+        <div>
+
+            <p class="admin-panel-label">
+                ACTION REQUIRED
+            </p>
+
+            <h2>
+                Needs Attention
+            </h2>
+
+            <p>
+                Important student records that may require
+                an admin action.
+            </p>
+
+        </div>
+
+        <button
+            onclick="manageStudents()"
+            class="attention-view-all"
+        >
+            View All Students →
+        </button>
+
+    </div>
+
+
+    <div class="attention-grid">
+
+
+        <!-- PENDING -->
+
+        <button
+            class="attention-card attention-pending"
+            onclick="openAttention('PENDING')"
+        >
+
+            <div class="attention-icon">
+                ◷
+            </div>
+
+            <div>
+
+                <span>
+                    Pending Approval
+                </span>
+
+                <strong id="attentionPending">
+                    0
+                </strong>
+
+                <p>
+                    New registrations waiting
+                    for approval
+                </p>
+
+            </div>
+
+        </button>
+
+
+        <!-- EXPIRED -->
+
+        <button
+            class="attention-card attention-expired"
+            onclick="openAttention('EXPIRED')"
+        >
+
+            <div class="attention-icon">
+                !
+            </div>
+
+            <div>
+
+                <span>
+                    Expired Memberships
+                </span>
+
+                <strong id="attentionExpired">
+                    0
+                </strong>
+
+                <p>
+                    Students waiting for
+                    membership renewal
+                </p>
+
+            </div>
+
+        </button>
+
+
+        <!-- OVERDUE -->
+
+        <button
+            class="attention-card attention-overdue"
+            onclick="openAttention('OVERDUE')"
+        >
+
+            <div class="attention-icon">
+                ⚠
+            </div>
+
+            <div>
+
+                <span>
+                    Renewal Overdue
+                </span>
+
+                <strong id="attentionOverdue">
+                    0
+                </strong>
+
+                <p>
+                    Expired for 5+ days —
+                    seat may be released
+                </p>
+
+            </div>
+
+        </button>
+
+    </div>
+
+
+    <div
+        id="attentionMessage"
+        class="attention-message"
+    >
+        Checking records...
+    </div>
+
+</section>
+
+
+        <!-- =========================================
+             MANAGEMENT PANEL
+        ========================================== -->
+
+        <section class="admin-management-panel">
+
+
+            <div class="admin-management-copy">
+
+                <p class="admin-panel-label">
+                    QUICK MANAGEMENT
+                </p>
+
+                <h2>
+                    Student & Seat Management
+                </h2>
+
+                <p>
+
+                    Review new registrations, approve students,
+                    allocate seats, activate memberships,
+                    renew expired memberships and deactivate
+                    records when required.
+
+                </p>
+
+            </div>
+
+
+            <button
+                onclick="manageStudents()"
+                class="admin-management-button"
+            >
+                Open Student Management
+
+                <span>
+                    →
+                </span>
+            </button>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             FOOTER MESSAGE
+        ========================================== -->
+
+        <section class="admin-dashboard-note">
+
+            <span>
+                ◆
+            </span>
+
+            <p>
+                SAB Library Administration System
+                • Student records and access are restricted
+                to authorised administrators.
+            </p>
+
+        </section>
+
+
+    </main>
+
+
+
+    <script src="admin-dashboard.js"></script>
+
+</body>
+
+</html>

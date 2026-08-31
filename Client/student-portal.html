@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SAB Library | Student Login</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body class="auth-body">
+
+    <div class="auth-page">
+
+
+        <!-- LEFT BRAND PANEL -->
+
+        <section class="auth-brand-panel">
+
+            <a
+                href="index.html"
+                class="auth-brand"
+            >
+
+                <div class="auth-logo">
+                    SAB
+                </div>
+
+                <div>
+                    <h2>
+                        SAB Library
+                    </h2>
+
+                    <p>
+                        Study • Focus • Achieve
+                    </p>
+                </div>
+
+            </a>
+
+
+
+            <div class="auth-brand-content">
+
+                <p class="auth-eyebrow">
+                    MEMBER ACCESS
+                </p>
+
+                <h1>
+                    Welcome Back,
+                    <span>Keep Moving Forward.</span>
+                </h1>
+
+                <p class="auth-description">
+
+                    Access your SAB Library membership,
+                    seat details and validity information
+                    securely through your student portal.
+
+                </p>
+
+
+                <div class="auth-benefits">
+
+                    <div>
+                        <span>✓</span>
+                        View your allotted seat
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Check membership validity
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Track remaining membership days
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Secure student-only access
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="auth-quote">
+
+                <span>
+                    “
+                </span>
+
+                Small progress every day
+                becomes a great achievement.
+
+            </div>
+
+        </section>
+
+
+
+        <!-- RIGHT LOGIN PANEL -->
+
+        <section class="auth-form-panel">
+
+
+            <div class="login-card">
+
+
+                <div class="auth-form-header">
+
+                    <a
+                        href="index.html"
+                        class="back-home"
+                    >
+                        ← Back to Home
+                    </a>
+
+
+                    <p class="form-label">
+                        STUDENT PORTAL
+                    </p>
+
+
+                    <h2>
+                        Student Login
+                    </h2>
+
+
+                    <p>
+                        Enter your Library ID and Portal PIN
+                        to access your account.
+                    </p>
+
+                </div>
+
+
+
+                <div class="student-login-form">
+
+
+                    <div class="form-group">
+
+                        <label for="libraryId">
+                            Library ID
+                        </label>
+
+                        <input
+                            type="text"
+                            id="libraryId"
+                            placeholder="e.g. SAB-007"
+                            autocomplete="username"
+                            maxlength="20"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="pin">
+                            Portal PIN
+                        </label>
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                id="pin"
+                                placeholder="Enter 6-digit PIN"
+                                inputmode="numeric"
+                                maxlength="6"
+                                autocomplete="current-password"
+                            >
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                onclick="toggleStudentPin()"
+                                aria-label="Show or hide PIN"
+                            >
+                                Show
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <button
+                        type="button"
+                        class="auth-submit-btn"
+                        onclick="studentLogin()"
+                    >
+                        Login to Portal
+                        <span>→</span>
+                    </button>
+
+
+                </div>
+
+
+
+                <div
+                    id="message"
+                    class="form-message"
+                ></div>
+
+
+
+                <div class="registration-note">
+
+                    <div class="note-icon">
+                        i
+                    </div>
+
+                    <p>
+
+                        Your Library ID and Portal PIN are provided
+                        after your registration is approved by
+                        the SAB Library administrator.
+
+                    </p>
+
+                </div>
+
+
+
+                <div class="existing-member">
+
+                    Not registered yet?
+
+                    <a href="register.html">
+                        Register Now
+                    </a>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+
+
+    <script src="student-portal.js"></script>
+
+
+    <script>
+
+        function toggleStudentPin() {
+
+            const pinInput =
+                document.getElementById("pin");
+
+            const toggleButton =
+                document.querySelector(".password-toggle");
+
+
+            if (pinInput.type === "password") {
+
+                pinInput.type = "text";
+
+                toggleButton.textContent =
+                    "Hide";
+
+            } else {
+
+                pinInput.type =
+                    "password";
+
+                toggleButton.textContent =
+                    "Show";
+
+            }
+
+        }
+
+
+        document
+            .getElementById("pin")
+            .addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (event.key === "Enter") {
+
+                        studentLogin();
+
+                    }
+
+                }
+            );
+
+    </script>
+
+</body>
+
+</html>

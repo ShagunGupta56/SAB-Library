@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SAB Library | Student Registration</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body class="auth-body">
+
+    <div class="auth-page">
+
+
+        <!-- LEFT BRAND PANEL -->
+
+        <section class="auth-brand-panel">
+
+            <a
+                href="index.html"
+                class="auth-brand"
+            >
+
+                <div class="auth-logo">
+                    SAB
+                </div>
+
+                <div>
+                    <h2>
+                        SAB Library
+                    </h2>
+
+                    <p>
+                        Study • Focus • Achieve
+                    </p>
+                </div>
+
+            </a>
+
+
+            <div class="auth-brand-content">
+
+                <p class="auth-eyebrow">
+                    STUDENT MEMBERSHIP
+                </p>
+
+                <h1>
+                    Build Better
+                    <span>Study Habits.</span>
+                </h1>
+
+                <p class="auth-description">
+
+                    Join a peaceful, secure and focused
+                    study environment created for students
+                    who are serious about their goals.
+
+                </p>
+
+
+                <div class="auth-benefits">
+
+                    <div>
+                        <span>✓</span>
+                        Peaceful study environment
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Comfortable individual seating
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        High-speed Wi-Fi
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        CCTV monitored premises
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="auth-quote">
+
+                <span>
+                    “
+                </span>
+
+                Discipline today creates
+                opportunities tomorrow.
+
+            </div>
+
+        </section>
+
+
+
+        <!-- RIGHT FORM PANEL -->
+
+        <section class="auth-form-panel">
+
+            <div class="registration-card">
+
+
+                <div class="auth-form-header">
+
+                    <a
+                        href="index.html"
+                        class="back-home"
+                    >
+                        ← Back to Home
+                    </a>
+
+
+                    <p class="form-label">
+                        NEW MEMBER
+                    </p>
+
+
+                    <h2>
+                        Student Registration
+                    </h2>
+
+
+                    <p>
+                        Enter your details below to request
+                        membership at SAB Library.
+                    </p>
+
+                </div>
+
+
+
+                <form id="registrationForm">
+
+
+                    <div class="form-group">
+
+                        <label for="full_name">
+                            Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="full_name"
+                            placeholder="Enter student's full name"
+                            autocomplete="name"
+                            maxlength="100"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="father_name">
+                            Father's Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="father_name"
+                            placeholder="Enter father's name"
+                            maxlength="100"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-row">
+
+
+                        <div class="form-group">
+
+                            <label for="phone">
+                                Mobile Number
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="phone"
+                                placeholder="10-digit mobile number"
+                                inputmode="numeric"
+                                maxlength="10"
+                                pattern="[0-9]{10}"
+                                autocomplete="tel"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="student_class">
+                                Class
+                            </label>
+
+                            <select
+                                id="student_class"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Class
+                                </option>
+
+                                <option value="9">
+                                    Class 9
+                                </option>
+
+                                <option value="10">
+                                    Class 10
+                                </option>
+
+                                <option value="11">
+                                    Class 11
+                                </option>
+
+                                <option value="12">
+                                    Class 12
+                                </option>
+
+                                <option value="12+">
+                                    12+ / Other
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="school_college">
+                            School / College
+                            <span class="optional">
+                                Optional
+                            </span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="school_college"
+                            placeholder="Enter school or college name"
+                            maxlength="150"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="address">
+                            Address
+                            <span class="optional">
+                                Optional
+                            </span>
+                        </label>
+
+                        <textarea
+                            id="address"
+                            placeholder="Enter your address"
+                            maxlength="255"
+                            rows="3"
+                        ></textarea>
+
+                    </div>
+
+
+
+                    <button
+                        type="submit"
+                        class="auth-submit-btn"
+                    >
+
+                        Submit Registration
+
+                        <span>
+                            →
+                        </span>
+
+                    </button>
+
+
+                </form>
+
+
+
+                <div
+                    id="message"
+                    class="form-message"
+                ></div>
+
+
+
+                <div class="registration-note">
+
+                    <div class="note-icon">
+                        i
+                    </div>
+
+                    <p>
+
+                        After registration, your request will be
+                        reviewed by the library admin. Once approved,
+                        you will receive your
+                        <strong>Library ID and Portal PIN.</strong>
+
+                    </p>
+
+                </div>
+
+
+
+                <div class="existing-member">
+
+                    Already registered?
+
+                    <a href="student-portal.html">
+                        Student Login
+                    </a>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
