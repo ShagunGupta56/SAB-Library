@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "npm install --prefix server",
-    "start": "node server/server.js"
+    "postinstall": "npm install --prefix Server",
+    "start": "node Server/server.js"
   }
 }
