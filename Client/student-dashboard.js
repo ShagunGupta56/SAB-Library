@@ -1,9 +1,25 @@
 const studentToken =
     localStorage.getItem("studentToken");
 
+
+// If student is not logged in
 if (!studentToken) {
+
     window.location.href =
         "student-portal.html";
+}
+
+
+// Escape dynamic data before putting it inside innerHTML
+// This protects the dashboard from XSS attacks.
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
@@ -24,12 +40,15 @@ async function loadStudentDashboard() {
             }
         );
 
+
         const student =
             await response.json();
 
 
+        // Handle failed API response
         if (!response.ok) {
 
+            // Invalid / expired login token
             if (
                 response.status === 401 ||
                 response.status === 403
@@ -45,13 +64,18 @@ async function loadStudentDashboard() {
                 return;
             }
 
+
             details.innerHTML =
-                `<p>${student.message}</p>`;
+                `<p>${escapeHtml(
+                    student.message ||
+                    "Unable to load dashboard."
+                )}</p>`;
 
             return;
         }
 
 
+        // Format membership dates
         const validFrom =
             student.valid_from
                 ? new Date(
@@ -71,8 +95,10 @@ async function loadStudentDashboard() {
         // Membership warning
         let membershipAlert = "";
 
+
         if (
-            student.membership_status === "EXPIRED"
+            student.membership_status ===
+            "EXPIRED"
         ) {
 
             membershipAlert = `
@@ -105,18 +131,22 @@ async function loadStudentDashboard() {
 
         } else if (
             student.days_remaining !== null &&
+            student.days_remaining !== undefined &&
             student.days_remaining <= 3
         ) {
 
             membershipAlert = `
                 <div class="membership-alert warning">
-                    Only ${student.days_remaining}
+                    Only ${escapeHtml(
+                        student.days_remaining
+                    )}
                     days of membership validity are left.
                 </div>
             `;
         }
 
 
+        // Render student dashboard
         details.innerHTML = `
 
             ${membershipAlert}
@@ -124,52 +154,115 @@ async function loadStudentDashboard() {
             <div class="student-card">
 
                 <h3>
-                    Welcome, ${student.full_name}
+                    Welcome,
+                    ${escapeHtml(
+                        student.full_name
+                    )}
                 </h3>
 
                 <p>
-                    <strong>Library ID:</strong>
-                    ${student.library_id}
+                    <strong>
+                        Library ID:
+                    </strong>
+
+                    ${escapeHtml(
+                        student.library_id ||
+                        "Not Available"
+                    )}
                 </p>
 
-                <p>
-                    <strong>Class:</strong>
-                    ${student.student_class}
-                </p>
 
                 <p>
-                    <strong>School / College:</strong>
-                    ${student.school_college || "Not Provided"}
+                    <strong>
+                        Class:
+                    </strong>
+
+                    ${escapeHtml(
+                        student.student_class ||
+                        "Not Provided"
+                    )}
                 </p>
 
-                <p>
-                    <strong>Seat Number:</strong>
-                    ${student.seat_number || "Not Assigned"}
-                </p>
 
                 <p>
-                    <strong>Membership Plan:</strong>
-                    ${student.plan || "Not Activated"}
+                    <strong>
+                        School / College:
+                    </strong>
+
+                    ${escapeHtml(
+                        student.school_college ||
+                        "Not Provided"
+                    )}
                 </p>
 
-                <p>
-                    <strong>Valid From:</strong>
-                    ${validFrom}
-                </p>
 
                 <p>
-                    <strong>Valid Till:</strong>
-                    ${validTill}
+                    <strong>
+                        Seat Number:
+                    </strong>
+
+                    ${escapeHtml(
+                        student.seat_number ||
+                        "Not Assigned"
+                    )}
                 </p>
 
-                <p>
-                    <strong>Membership Status:</strong>
-                    ${student.membership_status || "Not Active"}
-                </p>
 
                 <p>
-                    <strong>Days Remaining:</strong>
-                    ${student.days_remaining ?? "Not Available"}
+                    <strong>
+                        Membership Plan:
+                    </strong>
+
+                    ${escapeHtml(
+                        student.plan ||
+                        "Not Activated"
+                    )}
+                </p>
+
+
+                <p>
+                    <strong>
+                        Valid From:
+                    </strong>
+
+                    ${escapeHtml(
+                        validFrom
+                    )}
+                </p>
+
+
+                <p>
+                    <strong>
+                        Valid Till:
+                    </strong>
+
+                    ${escapeHtml(
+                        validTill
+                    )}
+                </p>
+
+
+                <p>
+                    <strong>
+                        Membership Status:
+                    </strong>
+
+                    ${escapeHtml(
+                        student.membership_status ||
+                        "Not Active"
+                    )}
+                </p>
+
+
+                <p>
+                    <strong>
+                        Days Remaining:
+                    </strong>
+
+                    ${escapeHtml(
+                        student.days_remaining ??
+                        "Not Available"
+                    )}
                 </p>
 
             </div>
@@ -197,4 +290,5 @@ function studentLogout() {
 }
 
 
+// Load dashboard when page opens
 loadStudentDashboard();
