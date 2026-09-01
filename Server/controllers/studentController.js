@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const registerStudent = (req, res) => {
 
     const {
@@ -154,11 +155,9 @@ const approveStudent = (req, res) => {
 
         // Generate 6 digit PIN
         const portalPin =
-            String(
-                Math.floor(
-                    100000 + Math.random() * 900000
-                )
-            );
+                      String(
+                              crypto.randomInt(100000, 1000000)
+                     );
 
         try {
 
