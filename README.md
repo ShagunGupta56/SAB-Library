@@ -146,25 +146,43 @@ The application includes several security measures:
 
 ## 📸 Screenshots
 
-### Homepage
+### 🏠 Homepage
 
+<img src="screenshots/homepage.png" width="800" alt="SAB Library Homepage">
 
+---
 
-### Student Registration
+### ✨ Library Facilities
 
-<!-- Add registration screenshot here -->
+<img src="screenshots/facilities.png" width="800" alt="SAB Library Facilities">
 
-### Admin Dashboard
+---
 
-<!-- Add admin dashboard screenshot here -->
+### 📝 Student Registration
 
-### Student Management
+<img src="screenshots/registration.png" width="800" alt="Student Registration">
 
-<!-- Add student management screenshot here -->
+---
 
-### Student Dashboard
+### 📊 Admin Dashboard
 
-<!-- Add student dashboard screenshot here -->
+<img src="screenshots/admin-dashboard.png" width="800" alt="Admin Dashboard">
+
+---
+
+### 🎓 Student Dashboard
+
+<img src="screenshots/student-dashboard.png" width="800" alt="Student Dashboard">
+
+---
+
+## 📱 Scan to Visit SAB Library
+
+Scan the QR code below to open the live SAB Library website directly on your phone.
+
+<img src="screenshots/SAB-Library-QR.png" width="230" alt="SAB Library QR Code">
+
+**[🌐 Open SAB Library Live Website](https://sab-library-production.up.railway.app)**
 
 ---
 
