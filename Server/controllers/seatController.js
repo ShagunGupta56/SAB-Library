@@ -20,161 +20,279 @@ const allocateSeat = (req, res) => {
 
     const { student_id, seat_id } = req.body;
 
-    const studentSql =
-        "SELECT * FROM students WHERE id = ?";
 
-    db.query(studentSql, [student_id], (err, students) => {
+    // ==========================================
+    // CHECK STUDENT
+    // ==========================================
 
-        if (err) {
-            console.log(err);
-
-            return res.status(500).json({
-                message: "Failed to check student"
-            });
-        }
-
-        if (students.length === 0) {
-            return res.status(404).json({
-                message: "Student not found"
-            });
-        }
-
-        if (students[0].status !== "ACTIVE") {
-            return res.status(400).json({
-                message:
-                    "Student must be active before seat allocation"
-            });
-        }
+    const studentSql = `
+        SELECT *
+        FROM students
+        WHERE id = ?
+    `;
 
 
-        // Check whether student already has a seat
+    db.query(
+        studentSql,
+        [student_id],
+        (err, students) => {
 
-        const existingAllocationSql = `
-            SELECT sa.id, s.seat_number
-            FROM seat_allocations sa
+            if (err) {
 
-            JOIN seats s
-                ON sa.seat_id = s.id
+                console.log(err);
 
-            WHERE sa.student_id = ?
-            AND sa.status = 'ACTIVE'
-        `;
-
-        db.query(
-            existingAllocationSql,
-            [student_id],
-            (err, allocations) => {
-
-                if (err) {
-                    console.log(err);
-
-                    return res.status(500).json({
-                        message:
-                            "Failed to check existing seat"
-                    });
-                }
-
-                if (allocations.length > 0) {
-                    return res.status(400).json({
-                        message:
-                            `Student already has seat ${allocations[0].seat_number}`
-                    });
-                }
+                return res.status(500).json({
+                    message:
+                        "Failed to check student"
+                });
+            }
 
 
-                // Check selected seat
+            if (students.length === 0) {
 
-                const seatSql =
-                    "SELECT * FROM seats WHERE id = ?";
-
-                db.query(
-                    seatSql,
-                    [seat_id],
-                    (err, seats) => {
-
-                        if (err) {
-                            console.log(err);
-
-                            return res.status(500).json({
-                                message:
-                                    "Failed to check seat"
-                            });
-                        }
-
-                        if (seats.length === 0) {
-                            return res.status(404).json({
-                                message: "Seat not found"
-                            });
-                        }
-
-                        if (seats[0].status === "OCCUPIED") {
-                            return res.status(400).json({
-                                message:
-                                    "Seat is already occupied"
-                            });
-                        }
+                return res.status(404).json({
+                    message:
+                        "Student not found"
+                });
+            }
 
 
-                        // Create allocation
+            if (
+                students[0].status !==
+                "ACTIVE"
+            ) {
 
-                        const allocationSql = `
-                            INSERT INTO seat_allocations
-                            (student_id, seat_id)
-                            VALUES (?, ?)
-                        `;
-
-                        db.query(
-                            allocationSql,
-                            [student_id, seat_id],
-                            (err) => {
-
-                                if (err) {
-                                    console.log(err);
-
-                                    return res.status(500).json({
-                                        message:
-                                            "Seat allocation failed"
-                                    });
-                                }
+                return res.status(400).json({
+                    message:
+                        "Student must be approved before seat allocation"
+                });
+            }
 
 
-                                // Make seat occupied
+            // ==========================================
+            // CHECK ACTIVE MEMBERSHIP
+            // ==========================================
 
-                                const updateSeatSql = `
-                                    UPDATE seats
-                                    SET status = 'OCCUPIED'
-                                    WHERE id = ?
-                                `;
+            const membershipSql = `
+                SELECT id
+                FROM memberships
 
-                                db.query(
-                                    updateSeatSql,
-                                    [seat_id],
-                                    (err) => {
+                WHERE student_id = ?
+                AND status = 'ACTIVE'
+                AND valid_till >= CURRENT_DATE
 
-                                        if (err) {
-                                            console.log(err);
+                ORDER BY id DESC
+                LIMIT 1
+            `;
 
-                                            return res.status(500).json({
-                                                message:
-                                                    "Seat status update failed"
-                                            });
-                                        }
 
-                                        res.status(201).json({
+            db.query(
+                membershipSql,
+                [student_id],
+                (err, memberships) => {
+
+                    if (err) {
+
+                        console.log(err);
+
+                        return res.status(500).json({
+                            message:
+                                "Failed to check membership"
+                        });
+                    }
+
+
+                    if (
+                        memberships.length === 0
+                    ) {
+
+                        return res.status(400).json({
+                            message:
+                                "Active membership is required before seat allocation"
+                        });
+                    }
+
+
+                    // ==========================================
+                    // CHECK EXISTING SEAT
+                    // ==========================================
+
+                    const existingAllocationSql = `
+                        SELECT
+                            sa.id,
+                            s.seat_number
+
+                        FROM seat_allocations sa
+
+                        JOIN seats s
+                            ON sa.seat_id = s.id
+
+                        WHERE sa.student_id = ?
+                        AND sa.status = 'ACTIVE'
+                    `;
+
+
+                    db.query(
+                        existingAllocationSql,
+                        [student_id],
+                        (err, allocations) => {
+
+                            if (err) {
+
+                                console.log(err);
+
+                                return res.status(500).json({
+                                    message:
+                                        "Failed to check existing seat"
+                                });
+                            }
+
+
+                            if (
+                                allocations.length >
+                                0
+                            ) {
+
+                                return res.status(400).json({
+                                    message:
+                                        `Student already has seat ${allocations[0].seat_number}`
+                                });
+                            }
+
+
+                            // ==========================================
+                            // CHECK SELECTED SEAT
+                            // ==========================================
+
+                            const seatSql = `
+                                SELECT *
+                                FROM seats
+                                WHERE id = ?
+                            `;
+
+
+                            db.query(
+                                seatSql,
+                                [seat_id],
+                                (err, seats) => {
+
+                                    if (err) {
+
+                                        console.log(err);
+
+                                        return res.status(500).json({
                                             message:
-                                                "Seat allocated successfully",
-                                            seatNumber:
-                                                seats[0].seat_number
+                                                "Failed to check seat"
                                         });
                                     }
-                                );
-                            }
-                        );
-                    }
-                );
-            }
-        );
-    });
+
+
+                                    if (
+                                        seats.length === 0
+                                    ) {
+
+                                        return res.status(404).json({
+                                            message:
+                                                "Seat not found"
+                                        });
+                                    }
+
+
+                                    if (
+                                        seats[0].status ===
+                                        "OCCUPIED"
+                                    ) {
+
+                                        return res.status(400).json({
+                                            message:
+                                                "Seat is already occupied"
+                                        });
+                                    }
+
+
+                                    // ==========================================
+                                    // CREATE ALLOCATION
+                                    // ==========================================
+
+                                    const allocationSql = `
+                                        INSERT INTO seat_allocations
+                                        (
+                                            student_id,
+                                            seat_id
+                                        )
+
+                                        VALUES (?, ?)
+                                    `;
+
+
+                                    db.query(
+                                        allocationSql,
+                                        [
+                                            student_id,
+                                            seat_id
+                                        ],
+                                        (err) => {
+
+                                            if (err) {
+
+                                                console.log(err);
+
+                                                return res.status(500).json({
+                                                    message:
+                                                        "Seat allocation failed"
+                                                });
+                                            }
+
+
+                                            // ==================================
+                                            // MARK SEAT OCCUPIED
+                                            // ==================================
+
+                                            const updateSeatSql = `
+                                                UPDATE seats
+
+                                                SET status = 'OCCUPIED'
+
+                                                WHERE id = ?
+                                            `;
+
+
+                                            db.query(
+                                                updateSeatSql,
+                                                [seat_id],
+                                                (err) => {
+
+                                                    if (err) {
+
+                                                        console.log(err);
+
+                                                        return res.status(500).json({
+                                                            message:
+                                                                "Seat status update failed"
+                                                        });
+                                                    }
+
+
+                                                    return res.status(201).json({
+
+                                                        message:
+                                                            "Seat allocated successfully",
+
+                                                        seatNumber:
+                                                            seats[0].seat_number
+                                                    });
+                                                }
+                                            );
+                                        }
+                                    );
+                                }
+                            );
+                        }
+                    );
+                }
+            );
+        }
+    );
 };
 
 

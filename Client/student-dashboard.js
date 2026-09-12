@@ -22,6 +22,66 @@ function escapeHtml(value) {
         .replaceAll("'", "&#039;");
 }
 
+function getPaymentSection(student) {
+
+    return `
+        <div class="student-payment-card">
+
+            <h3>
+                Membership Payment
+            </h3>
+
+            <p>
+                Choose your membership duration.
+            </p>
+
+
+            <select id="onlineMonths">
+
+                <option value="1">
+                    1 Month — ₹800
+                </option>
+
+                <option value="2">
+                    2 Months — ₹1600
+                </option>
+
+                <option value="3">
+                    3 Months — ₹2400
+                </option>
+
+            </select>
+
+
+            <div
+                id="onlineAmount"
+                class="online-payment-amount"
+            >
+                ₹800
+            </div>
+
+
+            <button
+    class="online-pay-btn"
+    disabled
+>
+    Online Payment Activating Soon
+</button>
+
+<p class="payment-helper">
+    Online payment is being activated.
+    Please contact the library administrator for fee submission.
+</p>
+
+
+            <p class="payment-helper">
+                Membership will activate automatically
+                after successful payment.
+            </p>
+
+        </div>
+    `;
+}
 
 async function loadStudentDashboard() {
 
@@ -210,13 +270,13 @@ async function loadStudentDashboard() {
 
                 <p>
                     <strong>
-                        Membership Plan:
+                        Membership:
                     </strong>
 
-                    ${escapeHtml(
-                        student.plan ||
-                        "Not Activated"
-                    )}
+                    ${student.valid_till
+                       ? "Active Membership"
+                        : "Not Activated"
+                    }
                 </p>
 
 
@@ -266,6 +326,7 @@ async function loadStudentDashboard() {
                 </p>
 
             </div>
+            ${getPaymentSection(student)}
         `;
 
 
@@ -278,6 +339,246 @@ async function loadStudentDashboard() {
     }
 }
 
+document.addEventListener(
+    "change",
+    (event) => {
+
+        if (
+            event.target.id !==
+            "onlineMonths"
+        ) {
+            return;
+        }
+
+
+        const months =
+            Number(
+                event.target.value
+            );
+
+
+        const amount =
+            months * 800;
+
+
+        const amountElement =
+            document.getElementById(
+                "onlineAmount"
+            );
+
+
+        if (amountElement) {
+
+            amountElement.textContent =
+                `₹${amount}`;
+        }
+    }
+);
+
+async function payOnline() {
+
+    const monthsSelect =
+        document.getElementById(
+            "onlineMonths"
+        );
+
+
+    if (!monthsSelect) {
+
+        alert(
+            "Please select membership duration."
+        );
+
+        return;
+    }
+
+
+    const months =
+        Number(monthsSelect.value);
+
+
+    try {
+
+        // ==================================
+        // CREATE ORDER
+        // ==================================
+
+        const orderResponse =
+            await fetch(
+                "/api/payments/online/order",
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        Authorization:
+                            `Bearer ${studentToken}`
+                    },
+
+
+                    body:
+                        JSON.stringify({
+                            months
+                        })
+                }
+            );
+
+
+        const orderData =
+            await orderResponse.json();
+
+
+        if (!orderResponse.ok) {
+
+            alert(
+                orderData.message ||
+                "Unable to start payment."
+            );
+
+            return;
+        }
+
+
+        // ==================================
+        // OPEN RAZORPAY CHECKOUT
+        // ==================================
+
+        const options = {
+
+            key:
+                orderData.key,
+
+            amount:
+                orderData.amount,
+
+            currency:
+                orderData.currency,
+
+            name:
+                "SAB Library",
+
+            description:
+                `${months} Month Membership`,
+
+            order_id:
+                orderData.orderId,
+
+
+            handler:
+                async function (
+                    response
+                ) {
+
+                    try {
+
+                        const verifyResponse =
+                            await fetch(
+                                "/api/payments/online/verify",
+                                {
+                                    method:
+                                        "POST",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json",
+
+                                        Authorization:
+                                            `Bearer ${studentToken}`
+                                    },
+
+
+                                    body:
+                                        JSON.stringify({
+
+                                            razorpay_order_id:
+                                                response.razorpay_order_id,
+
+                                            razorpay_payment_id:
+                                                response.razorpay_payment_id,
+
+                                            razorpay_signature:
+                                                response.razorpay_signature
+                                        })
+                                }
+                            );
+
+
+                        const verifyData =
+                            await verifyResponse.json();
+
+
+                        if (
+                            verifyResponse.ok
+                        ) {
+
+                            alert(
+                                `Payment successful!\n\n` +
+                                `${verifyData.months} month membership activated.`
+                            );
+
+
+                            await loadStudentDashboard();
+
+
+                        } else {
+
+                            alert(
+                                verifyData.message ||
+                                "Payment verification failed."
+                            );
+                        }
+
+
+                    } catch (error) {
+
+                        console.log(error);
+
+                        alert(
+                            "Payment verification failed."
+                        );
+                    }
+                },
+
+
+            theme: {
+                color:
+                    "#0c2740"
+            }
+        };
+
+
+        const razorpay =
+            new Razorpay(options);
+
+
+        razorpay.on(
+            "payment.failed",
+            function (response) {
+
+                alert(
+                    response.error?.description ||
+                    "Payment failed. Please try again."
+                );
+            }
+        );
+
+
+        razorpay.open();
+
+
+    } catch (error) {
+
+        console.log(error);
+
+        alert(
+            "Unable to start online payment."
+        );
+    }
+}
 
 function studentLogout() {
 

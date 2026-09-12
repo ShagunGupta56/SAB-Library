@@ -1,55 +1,189 @@
-const form = document.getElementById("registrationForm");
-const message = document.getElementById("message");
+const form =
+    document.getElementById(
+        "registrationForm"
+    );
 
-form.addEventListener("submit", async (event) => {
+const message =
+    document.getElementById(
+        "message"
+    );
 
-    event.preventDefault();
+const photoInput =
+    document.getElementById(
+        "photo"
+    );
 
-    const studentData = {
-        full_name: document.getElementById("full_name").value,
-        father_name: document.getElementById("father_name").value,
-        phone: document.getElementById("phone").value,
-        student_class: document.getElementById("student_class").value,
-        school_college: document.getElementById("school_college").value,
-        address: document.getElementById("address").value
-    };
+const photoPreview =
+    document.getElementById(
+        "photoPreview"
+    );
 
-    try {
 
-        const response = await fetch(
-            "/api/students/register",
-            {
-                method: "POST",
+// ==========================================
+// PHOTO PREVIEW
+// ==========================================
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+photoInput.addEventListener(
+    "change",
+    () => {
 
-                body: JSON.stringify(studentData)
-            }
-        );
+        const file =
+            photoInput.files[0];
 
-        const data = await response.json();
 
-        if (response.ok) {
+        if (!file) {
 
-            message.innerText =
-                "Registration successful! Your request is pending approval.";
+            photoPreview.style.display =
+                "none";
 
-            form.reset();
-
-        } else {
-
-            message.innerText =
-                data.message || "Registration failed";
+            return;
         }
 
-    } catch (error) {
 
-        console.log(error);
+        const imageUrl =
+            URL.createObjectURL(file);
 
-        message.innerText =
-            "Unable to connect to server.";
+
+        photoPreview.src =
+            imageUrl;
+
+        photoPreview.style.display =
+            "block";
     }
+);
 
-});
+
+// ==========================================
+// REGISTRATION
+// ==========================================
+
+form.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault();
+
+
+        const photo =
+            photoInput.files[0];
+
+
+        if (!photo) {
+
+            message.innerText =
+                "Please add student photo.";
+
+            return;
+        }
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "full_name",
+            document.getElementById(
+                "full_name"
+            ).value
+        );
+
+
+        formData.append(
+            "father_name",
+            document.getElementById(
+                "father_name"
+            ).value
+        );
+
+
+        formData.append(
+            "phone",
+            document.getElementById(
+                "phone"
+            ).value
+        );
+
+
+        formData.append(
+            "student_class",
+            document.getElementById(
+                "student_class"
+            ).value
+        );
+
+
+        formData.append(
+            "school_college",
+            document.getElementById(
+                "school_college"
+            ).value
+        );
+
+
+        formData.append(
+            "address",
+            document.getElementById(
+                "address"
+            ).value
+        );
+
+
+        formData.append(
+            "photo",
+            photo
+        );
+
+
+        try {
+
+            message.innerText =
+                "Submitting registration...";
+
+
+            const response =
+                await fetch(
+                    "/api/students/register",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (response.ok) {
+
+                message.innerText =
+                    "Registration successful! Your request is pending approval.";
+
+
+                form.reset();
+
+
+                photoPreview.src = "";
+
+                photoPreview.style.display =
+                    "none";
+
+            } else {
+
+                message.innerText =
+                    data.message ||
+                    "Registration failed";
+            }
+
+
+        } catch (error) {
+
+            console.log(error);
+
+
+            message.innerText =
+                "Unable to connect to server.";
+        }
+    }
+);

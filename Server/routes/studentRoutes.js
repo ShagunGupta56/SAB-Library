@@ -19,9 +19,13 @@ const studentAuth =
     require("../middleware/studentAuth");
 
 
+const upload =
+    require("../middleware/upload");    
+
 // Public registration
 router.post(
     "/register",
+    upload.single("photo"),
     registerStudent
 );
 

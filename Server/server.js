@@ -39,6 +39,9 @@ const membershipRoutes =
 const authRoutes =
     require("./routes/authRoutes");
 
+const paymentRoutes =
+    require("./routes/paymentRoutes");    
+
 
 app.use(
     "/api/students",
@@ -65,6 +68,35 @@ app.use(
     authRoutes
 );
 
+app.use(
+    "/api/payments",
+    paymentRoutes
+);
+
+// ==========================================
+// UPLOAD ERROR HANDLER
+// ==========================================
+
+app.use((err, req, res, next) => {
+
+    console.log(err);
+
+    if (
+        err.name === "MulterError" ||
+        err.message ===
+            "Only JPG, PNG or WEBP images are allowed"
+    ) {
+
+        return res.status(400).json({
+            message:
+                err.code === "LIMIT_FILE_SIZE"
+                    ? "Photo must be smaller than 3 MB"
+                    : err.message
+        });
+    }
+
+    next(err);
+});
 
 // ==========================================
 // SERVE FRONTEND

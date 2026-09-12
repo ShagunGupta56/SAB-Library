@@ -293,7 +293,42 @@
 
                     </div>
 
+                   <div class="form-group">
 
+    <label for="photo">
+        Student Photo
+    </label>
+
+    <input
+    type="file"
+    id="photo"
+    name="photo"
+    accept="image/*"
+    capture="user"
+    required
+>
+
+    <small>
+        Take a clear photo using your phone
+        or choose a photo from gallery.
+        Maximum size: 3 MB.
+    </small>
+
+
+    <img
+        id="photoPreview"
+        alt="Student Photo Preview"
+        style="
+            display: none;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-top: 12px;
+        "
+    >
+
+</div>
 
                     <button
                         type="submit"

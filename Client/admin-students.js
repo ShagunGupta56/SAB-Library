@@ -233,7 +233,7 @@ function showTableMessage(message) {
     const cell =
         document.createElement("td");
 
-    cell.colSpan = 7;
+    cell.colSpan = 9;
 
     cell.className =
         "students-empty-message";
@@ -523,7 +523,8 @@ function getStudentStatusHtml(student) {
 function getMembershipHtml(student) {
 
     if (
-        student.status === "PENDING"
+        student.status ===
+        "PENDING"
     ) {
 
         return `
@@ -535,7 +536,8 @@ function getMembershipHtml(student) {
 
 
     if (
-        student.status === "INACTIVE"
+        student.status ===
+        "INACTIVE"
     ) {
 
         return `
@@ -550,27 +552,33 @@ function getMembershipHtml(student) {
         getMembershipInfo(student);
 
 
-    // --------------------------------------
-    // ACTIVE MEMBERSHIP
-    // --------------------------------------
-
     if (
-        membership.type === "ACTIVE"
+        membership.type ===
+        "ACTIVE"
     ) {
 
         return `
             <div class="membership-display">
 
-                <strong>
-                    ${escapeHtml(student.plan || "Membership")}
-                </strong>
-
                 <span class="membership-badge membership-active">
                     ACTIVE
                 </span>
 
+                <strong>
+                    Active Membership
+                </strong>
+
                 <small>
-                    Valid till:
+                    Valid From:
+                    ${escapeHtml(
+                        formatDate(
+                            student.valid_from
+                        )
+                    )}
+                </small>
+
+                <small>
+                    Valid Till:
                     ${escapeHtml(
                         formatDate(
                             student.valid_till
@@ -578,11 +586,7 @@ function getMembershipHtml(student) {
                     )}
                 </small>
 
-                <small class="${
-                    membership.daysRemaining === 0
-                        ? "membership-expiring-today"
-                        : ""
-                }">
+                <small>
                     ${escapeHtml(
                         membership.label
                     )}
@@ -593,20 +597,13 @@ function getMembershipHtml(student) {
     }
 
 
-    // --------------------------------------
-    // EXPIRED / NO MEMBERSHIP
-    // --------------------------------------
-
-    let expiredMessage = "";
-
-
     if (
-        membership.type === "EXPIRED"
+        membership.type ===
+        "EXPIRED"
     ) {
 
-        expiredMessage = `
-
-            <div class="expired-membership-info">
+        return `
+            <div class="membership-display">
 
                 <span class="membership-badge membership-expired">
                     EXPIRED
@@ -618,67 +615,66 @@ function getMembershipHtml(student) {
                     )}
                 </small>
 
-                ${
-                    membership.overdue
-
-                        ? `
-                            <div class="renewal-overdue-warning">
-
-                                Renewal overdue —
-                                seat may now be released.
-
-                            </div>
-                        `
-
-                        : `
-                            <div class="renewal-grace-message">
-
-                                Allow a short renewal period
-                                before releasing the seat.
-
-                            </div>
-                        `
-                }
-
             </div>
         `;
     }
 
 
     return `
-
-        <div class="membership-display">
-
-            ${
-                student.plan
-
-                    ? `
-                        <strong>
-                            ${escapeHtml(
-                                student.plan
-                            )}
-                        </strong>
-                    `
-
-                    : `
-                        <strong>
-                            No Membership
-                        </strong>
-                    `
-            }
+        <span class="membership-helper-text">
+            Payment required
+        </span>
+    `;
+}
 
 
-            ${expiredMessage}
+// ==========================================
+// PAYMENT HTML
+// ==========================================
 
+function getPaymentHtml(student) {
+
+    const studentId =
+        Number(student.id);
+
+
+    if (
+        student.status ===
+        "PENDING"
+    ) {
+
+        return `
+            <span class="membership-helper-text">
+                Approve student first
+            </span>
+        `;
+    }
+
+
+    if (
+        student.status ===
+        "INACTIVE"
+    ) {
+
+        return `
+            <span class="membership-helper-text">
+                Student inactive
+            </span>
+        `;
+    }
+
+
+    return `
+        <div class="payment-status-display">
+
+            <label>
+                Membership Duration
+            </label>
 
             <select
-                id="membership-${Number(student.id)}"
-                aria-label="Select membership plan"
+                id="payment-months-${studentId}"
+                onchange="updatePaymentAmount(${studentId})"
             >
-
-                <option value="">
-                    Select Plan
-                </option>
 
                 <option value="1">
                     1 Month
@@ -695,23 +691,57 @@ function getMembershipHtml(student) {
             </select>
 
 
-            <button
-                onclick="createMembership(${Number(student.id)})"
+            <strong
+                id="payment-amount-${studentId}"
             >
+                ₹800
+            </strong>
 
-                ${
-                    student.plan
-                        ? "Renew Membership"
-                        : "Activate Membership"
-                }
 
+            <button
+                class="action-payment"
+                onclick="markCashPayment(${studentId})"
+            >
+                Confirm Cash Payment
             </button>
 
         </div>
     `;
 }
 
+function updatePaymentAmount(
+    studentId
+) {
 
+    const select =
+        document.getElementById(
+            `payment-months-${studentId}`
+        );
+
+    const amountElement =
+        document.getElementById(
+            `payment-amount-${studentId}`
+        );
+
+
+    if (
+        !select ||
+        !amountElement
+    ) {
+        return;
+    }
+
+
+    const months =
+        Number(select.value);
+
+    const amount =
+        months * 800;
+
+
+    amountElement.textContent =
+        `₹${amount}`;
+}
 // ==========================================
 // ACTION / SEAT HTML
 // ==========================================
@@ -752,6 +782,31 @@ function getActionHtml(student) {
         `;
     }
 
+    // ==========================================
+    // PAYMENT CHECK BEFORE SEAT ALLOCATION
+    // ==========================================
+
+
+   const membership =
+    getMembershipInfo(student);
+
+
+if (
+    membership.type !==
+    "ACTIVE"
+) {
+
+    return `
+        <div class="student-actions">
+
+            <span class="payment-required-message">
+                Active membership required
+                before seat allocation
+            </span>
+
+        </div>
+    `;
+}
 
     if (
         student.seat_number
@@ -893,8 +948,32 @@ function renderStudents() {
                 );
             }
 
-
+            
             row.innerHTML = `
+               
+                <!-- PHOTO -->
+
+                 <td>
+
+                 ${
+                     student.photo_url
+
+                    ? `
+                    <img
+                       src="${escapeHtml(student.photo_url)}"
+                       alt="${escapeHtml(student.full_name)}"
+                       class="student-admin-photo"
+                    >
+                      `
+
+                    : `
+                    <div class="student-photo-placeholder">
+                      No Photo
+                    </div>
+                    `
+                 }
+
+                </td>
 
                 <!-- NAME -->
 
@@ -995,6 +1074,16 @@ function renderStudents() {
                     )}
 
                 </td>
+
+                <!-- PAYMENT -->
+
+            <td>
+
+               ${getPaymentHtml(
+                       student
+                )}
+
+            </td>
 
 
                 <!-- ACTION -->
@@ -1111,6 +1200,131 @@ The PIN may not be shown again.`
     }
 }
 
+// ==========================================
+// MARK CASH PAYMENT
+// ==========================================
+
+async function markCashPayment(
+    studentId
+) {
+
+    const select =
+        document.getElementById(
+            `payment-months-${studentId}`
+        );
+
+
+    if (!select) {
+
+        alert(
+            "Please select membership duration."
+        );
+
+        return;
+    }
+
+
+    const months =
+        Number(select.value);
+
+    const amount =
+        months * 800;
+
+
+    const student =
+        allStudents.find(
+            item =>
+                Number(item.id) ===
+                Number(studentId)
+        );
+
+
+    const studentName =
+        student?.full_name ||
+        "this student";
+
+
+    const confirmation =
+        confirm(
+            `Confirm CASH payment?\n\n` +
+            `Student: ${studentName}\n` +
+            `Duration: ${months} month(s)\n` +
+            `Amount: ₹${amount}\n\n` +
+            `Membership will activate automatically.`
+        );
+
+
+    if (!confirmation) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/payments/cash/${studentId}`,
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        Authorization:
+                            `Bearer ${token}`
+                    },
+
+                    body:
+                        JSON.stringify({
+                            months
+                        })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            handleAuthFailure(response)
+        ) {
+            return;
+        }
+
+
+        if (response.ok) {
+
+            alert(
+                `Payment Successful!\n\n` +
+                `${months} month membership activated.\n` +
+                `Amount: ₹${amount}`
+            );
+
+
+            await loadStudents();
+
+
+        } else {
+
+            alert(
+                data.message ||
+                "Unable to record payment."
+            );
+        }
+
+
+    } catch (error) {
+
+        console.log(error);
+
+        alert(
+            "Unable to record payment."
+        );
+    }
+}
 
 // ==========================================
 // ALLOCATE SEAT

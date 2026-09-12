@@ -1,7 +1,8 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const registerStudent = (req, res) => {
+const cloudinary = require("../config/cloudinary");
+const registerStudent = async (req, res) => {
 
     const {
         full_name,
@@ -12,35 +13,113 @@ const registerStudent = (req, res) => {
         address
     } = req.body;
 
-    const sql = `
-        INSERT INTO students
-        (full_name, father_name, phone, student_class, school_college, address)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `;
 
-    const values = [
-        full_name,
-        father_name,
-        phone,
-        student_class,
-        school_college,
-        address
-    ];
+    // Photo is compulsory
+    if (!req.file) {
 
-    db.query(sql, values, (err, result) => {
-
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                message: "Registration failed"
-            });
-        }
-
-        res.status(201).json({
-            message: "Student registered successfully",
-            studentId: result.insertId
+        return res.status(400).json({
+            message: "Student photo is required"
         });
-    });
+    }
+
+
+    try {
+
+        // Convert uploaded photo into base64
+        // and send it to Cloudinary
+
+        const photoBase64 =
+            `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+
+        const uploadedPhoto =
+            await cloudinary.uploader.upload(
+                photoBase64,
+                {
+                    folder: "sab-library/students",
+
+                    transformation: [
+                        {
+                            width: 600,
+                            height: 600,
+                            crop: "limit",
+                            quality: "auto"
+                        }
+                    ]
+                }
+            );
+
+
+        const photoUrl =
+            uploadedPhoto.secure_url;
+
+
+        const sql = `
+            INSERT INTO students
+            (
+                full_name,
+                father_name,
+                phone,
+                student_class,
+                school_college,
+                address,
+                photo_url
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+
+
+        const values = [
+            full_name,
+            father_name,
+            phone,
+            student_class,
+            school_college,
+            address,
+            photoUrl
+        ];
+
+
+        db.query(
+            sql,
+            values,
+            (err, result) => {
+
+                if (err) {
+
+                    console.log(err);
+
+                    return res.status(500).json({
+                        message:
+                            "Registration failed"
+                    });
+                }
+
+
+                return res.status(201).json({
+
+                    message:
+                        "Student registered successfully",
+
+                    studentId:
+                        result.insertId
+                });
+            }
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Photo upload error:",
+            error
+        );
+
+
+        return res.status(500).json({
+            message:
+                "Unable to upload student photo"
+        });
+    }
 };
 
 const getAllStudents = (req, res) => {
