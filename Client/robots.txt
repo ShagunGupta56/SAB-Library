@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin-login.html
+Disallow: /admin-dashboard.html
+Disallow: /admin-students.html
+Disallow: /student-dashboard.html
+Disallow: /student-portal.html
+
+Sitemap: https://sab-library-production.up.railway.app/sitemap.xml
