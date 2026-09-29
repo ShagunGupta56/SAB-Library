@@ -3,10 +3,12 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 
 const upload = multer({
+
     storage,
 
+    // Maximum file accepted by backend = 5 MB
     limits: {
-        fileSize: 3 * 1024 * 1024
+        fileSize: 5 * 1024 * 1024
     },
 
     fileFilter: (req, file, cb) => {
