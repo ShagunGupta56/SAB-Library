@@ -62,16 +62,18 @@ function getPaymentSection(student) {
 
 
             <button
+    type="button"
     class="online-pay-btn"
-    disabled
+    id="onlinePayBtn"
+    onclick="payOnline()"
 >
-    Online Payment Activating Soon
+    Pay Now
 </button>
 
 <p class="payment-helper">
-    Online payment is being activated.
-    Please contact the library administrator for fee submission.
+    Secure online payment powered by Razorpay.
 </p>
+
 
 
             <p class="payment-helper">
