@@ -2,6 +2,7 @@ const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// ==================== ADMIN LOGIN ====================
 const adminLogin = (req, res) => {
     const { username, password } = req.body;
 
@@ -15,7 +16,7 @@ const adminLogin = (req, res) => {
 
     db.query(sql, [username], async (err, results) => {
         if (err) {
-            console.log(err);
+            console.error("Admin login database error:", err);
 
             return res.status(500).json({
                 message: "Login failed"
@@ -28,40 +29,59 @@ const adminLogin = (req, res) => {
             });
         }
 
-        const admin = results[0];
+        try {
+            const admin = results[0];
 
-        const isMatch = await bcrypt.compare(
-            password,
-            admin.password
-        );
+            const isMatch = await bcrypt.compare(
+                password,
+                admin.password
+            );
 
-        if (!isMatch) {
-            return res.status(401).json({
-                message: "Invalid username or password"
+            if (!isMatch) {
+                return res.status(401).json({
+                    message: "Invalid username or password"
+                });
+            }
+
+            if (!process.env.JWT_SECRET) {
+                console.error("JWT_SECRET is missing.");
+
+                return res.status(500).json({
+                    message: "Authentication configuration error"
+                });
+            }
+
+            const token = jwt.sign(
+                {
+                    adminId: admin.id,
+                    username: admin.username,
+                    role: "admin"
+                },
+                process.env.JWT_SECRET,
+                {
+                    algorithm: "HS256",
+                    expiresIn: "8h"
+                }
+            );
+
+            return res.status(200).json({
+                message: "Login successful",
+                token
+            });
+
+        } catch (error) {
+            console.error("Admin login error:", error);
+
+            return res.status(500).json({
+                message: "Login failed"
             });
         }
-
-        const token = jwt.sign(
-            {
-                adminId: admin.id,
-                username: admin.username
-            },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: "8h"
-            }
-        );
-
-        res.status(200).json({
-            message: "Login successful",
-            token
-        });
     });
 };
 
 
+// ==================== STUDENT LOGIN ====================
 const studentLogin = (req, res) => {
-
     const { library_id, pin } = req.body;
 
     if (!library_id || !pin) {
@@ -82,9 +102,8 @@ const studentLogin = (req, res) => {
     `;
 
     db.query(sql, [library_id], async (err, results) => {
-
         if (err) {
-            console.log(err);
+            console.error("Student login database error:", err);
 
             return res.status(500).json({
                 message: "Student login failed"
@@ -97,15 +116,14 @@ const studentLogin = (req, res) => {
             });
         }
 
-        const student = results[0];
-
-        if (student.status !== "ACTIVE") {
-            return res.status(403).json({
-                message: "Student account is not active"
-            });
-        }
-
         try {
+            const student = results[0];
+
+            if (student.status !== "ACTIVE") {
+                return res.status(403).json({
+                    message: "Student account is not active"
+                });
+            }
 
             const isMatch = await bcrypt.compare(
                 String(pin),
@@ -118,6 +136,14 @@ const studentLogin = (req, res) => {
                 });
             }
 
+            if (!process.env.JWT_SECRET) {
+                console.error("JWT_SECRET is missing.");
+
+                return res.status(500).json({
+                    message: "Authentication configuration error"
+                });
+            }
+
             const token = jwt.sign(
                 {
                     studentId: student.id,
@@ -126,11 +152,12 @@ const studentLogin = (req, res) => {
                 },
                 process.env.JWT_SECRET,
                 {
+                    algorithm: "HS256",
                     expiresIn: "8h"
                 }
             );
 
-            res.status(200).json({
+            return res.status(200).json({
                 message: "Login successful",
                 token,
                 student: {
@@ -140,17 +167,17 @@ const studentLogin = (req, res) => {
             });
 
         } catch (error) {
+            console.error("Student login error:", error);
 
-            console.log(error);
-
-            res.status(500).json({
+            return res.status(500).json({
                 message: "Student login failed"
             });
         }
     });
 };
 
+
 module.exports = {
     adminLogin,
-    studentLogin 
+    studentLogin
 };

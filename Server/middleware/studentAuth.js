@@ -15,9 +15,10 @@ const studentAuth = (req, res, next) => {
     try {
 
         const decoded = jwt.verify(
-            token,
-            process.env.JWT_SECRET
-        );
+                  token,
+                  process.env.JWT_SECRET,
+                  { algorithms: ["HS256"] }
+       );
 
         if (decoded.role !== "student") {
             return res.status(403).json({

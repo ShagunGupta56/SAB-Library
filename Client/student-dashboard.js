@@ -39,15 +39,15 @@ function getPaymentSection(student) {
             <select id="onlineMonths">
 
                 <option value="1">
-                    1 Month — ₹800
+                    1 Month — ₹600
                 </option>
 
                 <option value="2">
-                    2 Months — ₹1600
+                    2 Months — ₹1200
                 </option>
 
                 <option value="3">
-                    3 Months — ₹2400
+                    3 Months — ₹1800
                 </option>
 
             </select>
@@ -57,7 +57,7 @@ function getPaymentSection(student) {
                 id="onlineAmount"
                 class="online-payment-amount"
             >
-                ₹800
+                ₹600
             </div>
 
 
@@ -152,59 +152,59 @@ async function loadStudentDashboard() {
                 : "Not Available";
 
 
-        // Membership warning
-        let membershipAlert = "";
-
-
-        if (
-            student.membership_status ===
-            "EXPIRED"
-        ) {
-
-            membershipAlert = `
-                <div class="membership-alert expired">
-                    Membership expired.
-                    Please contact the library administrator
-                    for renewal.
-                </div>
-            `;
-
-        } else if (
-            student.days_remaining === 0
-        ) {
-
-            membershipAlert = `
-                <div class="membership-alert warning">
-                    Your membership expires today.
-                </div>
-            `;
-
-        } else if (
-            student.days_remaining === 1
-        ) {
-
-            membershipAlert = `
-                <div class="membership-alert warning">
-                    Only 1 day of membership validity is left.
-                </div>
-            `;
-
-        } else if (
-            student.days_remaining !== null &&
-            student.days_remaining !== undefined &&
-            student.days_remaining <= 3
-        ) {
-
-            membershipAlert = `
-                <div class="membership-alert warning">
-                    Only ${escapeHtml(
-                        student.days_remaining
-                    )}
-                    days of membership validity are left.
-                </div>
-            `;
+        // Membership renewal reminder (date-only comparison avoids timezone shifts)
+        function parseLocalDate(value) {
+            if (!value) return null;
+            const parts = String(value).slice(0, 10).split("-").map(Number);
+            if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+            return new Date(parts[0], parts[1] - 1, parts[2]);
         }
 
+        function daysUntilMembershipExpiry(value) {
+            const expiry = parseLocalDate(value);
+            if (!expiry) return null;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return Math.round((expiry.getTime() - today.getTime()) / 86400000);
+        }
+
+        const daysUntilExpiry = daysUntilMembershipExpiry(student.valid_till);
+        let membershipAlert = "";
+
+        if (student.valid_till && daysUntilExpiry !== null) {
+            if (daysUntilExpiry === 2) {
+                membershipAlert = `
+                    <div class="membership-alert warning">
+                        <strong>Membership renewal reminder</strong>
+                        <p>Your membership expires in 2 days. Please renew your ₹600 monthly fee on time.</p>
+                    </div>`;
+            } else if (daysUntilExpiry === 1) {
+                membershipAlert = `
+                    <div class="membership-alert warning">
+                        <strong>Membership expires tomorrow!</strong>
+                        <p>Please renew your membership to continue using your reserved seat.</p>
+                    </div>`;
+            } else if (daysUntilExpiry === 0) {
+                membershipAlert = `
+                    <div class="membership-alert warning">
+                        <strong>Membership expires today!</strong>
+                        <p>Please renew your membership today.</p>
+                    </div>`;
+            } else if (daysUntilExpiry < 0) {
+                const overdueDays = Math.abs(daysUntilExpiry);
+                membershipAlert = `
+                    <div class="membership-alert expired">
+                        <strong>Membership renewal overdue</strong>
+                        <p>Your membership expired ${overdueDays} day${overdueDays === 1 ? "" : "s"} ago.
+                        Please renew as soon as possible to avoid possible seat cancellation.</p>
+                    </div>`;
+            } else if (daysUntilExpiry <= 3) {
+                membershipAlert = `
+                    <div class="membership-alert warning">
+                        Your membership expires in ${daysUntilExpiry} days. Please renew on time.
+                    </div>`;
+            }
+        }
 
         // Render student dashboard
         details.innerHTML = `
@@ -358,7 +358,7 @@ document.addEventListener(
 
 
         const amount =
-            months * 800;
+            months * 600;
 
 
         const amountElement =

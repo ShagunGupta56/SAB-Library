@@ -24,7 +24,47 @@ const registerStudent = async (req, res) => {
 
 
     try {
+        const normalizedName = String(full_name || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
 
+const firstNameWord = normalizedName.split(" ")[0] || "";
+
+const normalizedPhone = String(phone || "")
+    .replace(/\D/g, "");
+
+if (!firstNameWord || !/^\d{10}$/.test(normalizedPhone)) {
+    return res.status(400).json({
+        message: "Please enter a valid name and 10-digit phone number."
+    });
+}
+
+const duplicates = await new Promise((resolve, reject) => {
+    db.query(
+        `SELECT id FROM students
+         WHERE LOWER(
+             SUBSTRING_INDEX(
+                 TRIM(REGEXP_REPLACE(full_name, '[[:space:]]+', ' ')),
+                 ' ',
+                 1
+             )
+         ) = ?
+         AND REGEXP_REPLACE(phone, '[^0-9]', '') = ?
+         LIMIT 1`,
+        [firstNameWord, normalizedPhone],
+        (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
+        }
+    );
+});
+
+if (duplicates.length > 0) {
+    return res.status(409).json({
+        message: "This student is already registered."
+    });
+}
         // Convert uploaded photo into base64
         // and send it to Cloudinary
 
@@ -108,18 +148,12 @@ const registerStudent = async (req, res) => {
         );
 
     } catch (error) {
+    console.error("Student registration error:", error);
 
-        console.log(
-            "Photo upload error:",
-            error
-        );
-
-
-        return res.status(500).json({
-            message:
-                "Unable to upload student photo"
-        });
-    }
+    return res.status(500).json({
+        message: "Registration failed. Please try again later."
+    });
+}
 };
 
 const getAllStudents = (req, res) => {

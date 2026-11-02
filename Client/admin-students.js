@@ -694,7 +694,7 @@ function getPaymentHtml(student) {
             <strong
                 id="payment-amount-${studentId}"
             >
-                ₹800
+                ₹600
             </strong>
 
 
@@ -736,7 +736,7 @@ function updatePaymentAmount(
         Number(select.value);
 
     const amount =
-        months * 800;
+        months * 600;
 
 
     amountElement.textContent =
@@ -1228,7 +1228,7 @@ async function markCashPayment(
         Number(select.value);
 
     const amount =
-        months * 800;
+        months * 600;
 
 
     const student =

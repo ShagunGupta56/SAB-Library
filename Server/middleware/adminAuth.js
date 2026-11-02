@@ -2,8 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const adminAuth = (req, res, next) => {
 
-    const authHeader =
-        req.headers.authorization;
+    const authHeader = req.headers.authorization;
 
     if (
         !authHeader ||
@@ -14,25 +13,33 @@ const adminAuth = (req, res, next) => {
         });
     }
 
-    const token =
-        authHeader.split(" ")[1];
+    const token = authHeader.slice(7);
 
     try {
-
         const decoded = jwt.verify(
             token,
-            process.env.JWT_SECRET
+            process.env.JWT_SECRET,
+            { algorithms: ["HS256"] }
         );
 
-        req.admin = decoded;
+        // Only admin tokens can access admin routes
+        if (
+            decoded.role !== "admin" ||
+            !decoded.adminId
+        ) {
+            return res.status(403).json({
+                message: "Admin access only."
+            });
+        }
 
+        req.admin = decoded;
         next();
 
     } catch (error) {
-
         return res.status(401).json({
-            message: "Invalid or expired token"
+            message: "Invalid or expired token."
         });
     }
 };
+
 module.exports = adminAuth;

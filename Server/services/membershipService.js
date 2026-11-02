@@ -45,13 +45,10 @@ function applyMembershipForPayment(
 
                 const updateSql = `
                     UPDATE memberships
-
-                    SET
-                        valid_till =
-                            DATE_ADD(
-                                valid_till,
-                                INTERVAL ? MONTH
-                            ),
+                    SET valid_till = DATE_ADD(
+                    valid_till,
+                    INTERVAL ? MONTH
+                    )
                     WHERE id = ?
                 `;
 

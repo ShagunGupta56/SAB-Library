@@ -13,8 +13,18 @@ if (!token) {
 // SETTINGS
 // ==========================================
 
-const RENEWAL_GRACE_DAYS = 5;
+const RENEWAL_GRACE_DAYS = 2;
 
+
+// Escape values inserted into HTML.
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
 
 // ==========================================
 // AUTH FAILURE
@@ -130,6 +140,7 @@ async function loadDashboard() {
 
         // Now load attention section
         await loadAttentionData();
+        await loadRenewalReminders();
 
 
     } catch (error) {
@@ -294,6 +305,191 @@ async function loadAttentionData() {
             "Attention Data Error:",
             error
         );
+    }
+}
+
+// ==========================================
+// MEMBERSHIP RENEWAL REMINDERS
+// ==========================================
+
+function getDateOnly(value) {
+    if (!value) return null;
+
+    const parts = String(value)
+        .slice(0, 10)
+        .split("-")
+        .map(Number);
+
+    if (parts.length !== 3 || parts.some(Number.isNaN)) {
+        return null;
+    }
+
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+
+function getDaysUntilExpiry(validTill) {
+    const expiry = getDateOnly(validTill);
+    if (!expiry) return null;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return Math.round(
+        (expiry.getTime() - today.getTime()) /
+        (24 * 60 * 60 * 1000)
+    );
+}
+
+function createWhatsAppReminder(student, daysUntilExpiry) {
+    const rawPhone = String(student.phone || "")
+        .replace(/\D/g, "");
+
+    let phone = rawPhone;
+
+    // Indian phone number: add country code if missing.
+    if (phone.length === 10) {
+        phone = "91" + phone;
+    } else if (phone.length === 12 && phone.startsWith("91")) {
+        // Already includes India's country code.
+    } else {
+        return "";
+    }
+
+    const studentName = student.full_name || "Student";
+    const parsedExpiry = getDateOnly(student.valid_till);
+    const expiryDate = parsedExpiry
+        ? parsedExpiry.toLocaleDateString("en-IN")
+        : "the listed expiry date";
+
+    let message;
+
+if (daysUntilExpiry > 0) {
+  message = `🙏 Hello ${studentName}!
+
+This is a friendly reminder from SAB Library.
+
+Your membership expires on ${expiryDate}.
+
+💳 Renewal Fee: ₹600
+
+Please renew your membership on time to continue enjoying our library facilities.
+
+🔐 Student Portal Login:
+https://sab-library-production.up.railway.app/student-portal.html
+
+Thank you for being a part of SAB Library!
+
+— Team SAB Library`;
+} else {
+  const overdueDays = Math.abs(daysUntilExpiry);
+
+  message = `🙏 Hello ${studentName}!
+
+This is a friendly reminder from SAB Library.
+
+Your membership expired on ${expiryDate} and is now overdue by ${overdueDays} day${overdueDays === 1 ? "" : "s"}.
+
+💳 Renewal Fee: ₹600
+
+Please renew your membership as soon as possible to avoid possible seat cancellation.
+
+🔐 Student Portal Login:
+https://sab-library-production.up.railway.app/student-portal.html
+
+Thank you for being a part of SAB Library!
+
+— Team SAB Library`;
+}
+
+    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
+
+async function loadRenewalReminders() {
+    const container = document.getElementById("renewalRemindersList");
+    if (!container) return;
+
+    try {
+        const response = await fetch("/api/students", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            if (handleAuthFailure(response)) return;
+            throw new Error("Unable to load students");
+        }
+
+        const students = await response.json();
+
+        if (!Array.isArray(students)) {
+            container.textContent = "Unable to load renewal reminders.";
+            return;
+        }
+
+        const reminders = students
+            .map(student => ({
+                ...student,
+                daysUntilExpiry: getDaysUntilExpiry(student.valid_till)
+            }))
+            .filter(student =>
+                student.status === "ACTIVE" &&
+                student.daysUntilExpiry !== null &&
+                student.daysUntilExpiry <= 2
+            )
+            .sort((a, b) =>
+                a.daysUntilExpiry - b.daysUntilExpiry
+            );
+
+        if (reminders.length === 0) {
+            container.innerHTML =
+                "<p>No memberships need renewal reminders right now.</p>";
+            return;
+        }
+
+        container.innerHTML = reminders.map(student => {
+            const days = student.daysUntilExpiry;
+            const expiryText = days > 0
+                ? `Expires in ${days} day${days === 1 ? "" : "s"}`
+                : days === 0
+                    ? "Expires today"
+                    : `Expired ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"} ago`;
+
+            const whatsappLink =
+                createWhatsAppReminder(student, days);
+
+            return `
+                <article class="student-info-card" style="margin-bottom:12px">
+                    <div>
+                        <h3>${escapeHtml(student.full_name || "Student")}</h3>
+                        <p>Phone: ${escapeHtml(student.phone || "Not available")}</p>
+                        <p>Seat: ${escapeHtml(student.seat_number || "Not assigned")}</p>
+                        <p>Expiry: ${escapeHtml(
+                            student.valid_till
+                                ? (getDateOnly(student.valid_till)
+                                    ? getDateOnly(student.valid_till).toLocaleDateString("en-IN")
+                                    : "Not available")
+                                : "Not available"
+                        )}</p>
+                        <strong>${escapeHtml(expiryText)}</strong>
+                        ${
+                            whatsappLink
+                                ? `<p><a class="admin-primary-action"
+                                    href="${escapeHtml(whatsappLink)}"
+                                    target="_blank"
+                                    rel="noopener noreferrer">
+                                    Open WhatsApp Reminder
+                                   </a></p>`
+                                : `<p>Check the student's phone number before sending a reminder.</p>`
+                        }
+                    </div>
+                </article>
+            `;
+        }).join("");
+
+    } catch (error) {
+        console.error("Renewal reminder error:", error);
+        container.textContent = "Unable to load renewal reminders.";
     }
 }
 
